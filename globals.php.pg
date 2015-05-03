@@ -1,0 +1,13 @@
+<?php
+  $host = "localhost";
+  $user = "postgres";  
+  $pass = "cobi5dog";
+  $pass = "postgres";
+  $db = "burgaddr";
+
+  $debug = false;
+
+  // This is the year we are updating to
+  $setYear = "13";
+
+?>

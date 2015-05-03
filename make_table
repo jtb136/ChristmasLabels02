@@ -1,0 +1,42 @@
+/* -------------------------------------------------------- 
+  phpPgAdmin 2.4.2 DB Dump
+  http://www.sourceforge.net/projects/phppgadmin/
+  Host: ath900:5432
+  Database : "BurgAddr"
+  Table : "Address" 
+  2003-10-09 20:10:22
+-------------------------------------------------------- */ 
+ 
+CREATE TABLE "Address2" (
+   "LastName" char(20) NOT NULL,
+   "AddrName" char(25) NOT NULL,
+   "MFirstMI" char(20),
+   "FFirstMI" char(20),
+   "Address" char(40),
+   "City" char(20),
+   "State" char(2),
+   "Zip" char(10),
+   "HomePhone" char(12),
+   "M_W_Phone" char(12),
+   "F_W_Phone" char(12),
+   "M_Birth" char(10),
+   "F_Birth" char(10),
+   "Child_1_Name" char(20),
+   "Child_1_BirthDate" char(10),
+   "Child_2_Name" char(20),
+   "Child_2_BirthDate" char(10),
+   "Child_3_BirthName" char(20),
+   "Child_3_BirthDate" char(10),
+   "Child_4_BirthName" char(20),
+   "Child_4_BirthDate" char(10),
+   "Child_5_BirthName" char(20),
+   "Child_5_BirthDate" char(10),
+   "Rec_C_Card" char(2),
+   "Sent_C_Card" char(2),
+   "Business" char(2),
+   "Bus_Type" char(20),
+   "Comments" char(255),
+   "Index"   serial NOT NULL,
+   CONSTRAINT "Address2_pkey" PRIMARY KEY ("Index")
+);
+

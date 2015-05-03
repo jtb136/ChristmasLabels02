@@ -1,0 +1,237 @@
+<html>
+<header>
+  <SCRIPT LANGUAGE="JavaScript">
+    function smove() {
+      <?php
+        // Get the Global variables in the new 4.2 way
+        $searchname = $_POST["searchname"];
+        $labelnumber = $_POST["labelnumber"];
+        echo ('alert("About to delete: ' . $labelnumber . ' If this is in error, please use task manager to terminate IE");');
+        echo ('self.location =  "delete.php?delete=' . $labelnumber .'";');
+      ?>
+    }
+
+    function doUpdate() {
+      <?php
+        // Get the Global variables in the new 4.2 way
+        $searchname = $_POST["searchname"];
+        $labelnumber = $_POST["labelnumber"];
+        include("globals.php");
+        echo ('alert("About to update: ' . $labelnumber . ' to year ' . $setYear .'");');
+        echo ('self.location =  "update.php?update=' . $labelnumber .'";');
+
+      ?>
+    }
+
+   function doUpdate1(indexA) {
+        alert("About to update: " + indexA );
+        self.location =  "update.php?update=" +  indexA;
+    }
+  </SCRIPT>
+</header>
+<body>
+
+<Center><B><H2><FONT COLOR="#0000FF">Burgess Family</FONT></H2></B></Center>
+<Center><B><H2><FONT COLOR="#0000FF">Christmas Label Database</FONT></H2></B></Center>
+
+<TABLE BORDER="1">
+<TR>
+<TD width="30%">
+  <a href="addRecord.php"><b>Add</b> a new record</a><br>
+</TD>
+<TD width="40%">
+  To <b>redisplay</b> complete table, leave box emtpy, and press button. <br>
+  <FORM ENCTYPE="multipart/form-data" ACTION="labels.php" METHOD=POST>
+  Search for: <INPUT name="searchname"> &nbsp; &nbsp;
+          <INPUT TYPE="submit" VALUE="Search for name">
+</TD>
+<TD width="40%">
+  To <b>update</b> the year, or <b>delete</b> a record, input the index number: <INPUT name="labelnumber"> &nbsp; &nbsp;
+          <INPUT TYPE="submit" VALUE="Show label">
+  </FORM>
+</TD>
+</TR>
+</TABLE>
+
+<?php
+  include("globals.php");
+  if ($debug) {
+    echo '<a href=../phpinfo.php>Php Info</a><br><br>';
+    echo 'Current PHP version: ' . phpversion();
+    echo '<br>';
+  }
+
+  if ($debug) {
+    echo ('$searchname = ' . $searchname . "<br>");
+    echo ('$labelnumber = ' . $labelnumber . "<br>");
+
+  }
+  // ***************  see all the Global variables ********************
+  // Here's a global variable
+  // $test_var = "Hello World!";
+  // foreach( $GLOBALS as $key=>$value)
+  // {
+  //   print "\$GLOBALS[\"$key\"] == $value<br>";
+  // }
+?>
+
+<?php
+  // include("globals.php");
+
+  echo '<TABLE border="1"><TR><TD>';
+  echo ("Search name = " . $searchname );
+  echo ("<br>");
+  echo ("Show label for row: " . $labelnumber);
+  echo '</TD></TR></TABLE>';
+  echo "<br><br>";
+
+  function output_form ($lastName,$debug)
+  {
+    include("globals.php");
+    // open a connection to the database server
+    $connection = pg_connect("host=$host dbname=$db user=$user password=$pass");
+    if (!$connection)
+      {
+        // die("Could not open connection to database server, error = " . pg_errormessage($connection));
+        die("Could not open connection to database server $host, error last = " . pg_last_error()
+           . "  error = " .  pg_errormessage($connection) );
+      }
+
+
+    $dbname = pg_dbname($connection);
+    $dbhost = pg_host($connection);
+    if ($debug) {
+      echo('Current database: ' .  $dbname . '<br>');
+      echo('Current host: ' .  $dbhost . '<br>');
+    }
+
+    // generate and execute a query
+    $query = 'SELECT "LastName", "AddrName","Address",';
+    $query .= '"City","State","Zip", "Rec_C_Card", "Index"  FROM burgaddr."Address"';
+    if ($lastName)
+      {
+        $query .= ' Where "LastName" = ' . "'" .  $lastName . "'";
+      }
+    $query .= ' ORDER BY "LastName", "AddrName"';
+    if ($debug) {
+          echo ("Query = ".$query . "<br>" 	);
+        }
+    // new name is pg_query, not pg_exec
+    $result = pg_exec($connection,$query) or die("Error in query: $query." . pg_last_error($connection));
+
+    // get the number of rows in the resultset
+    // new name is pg_num_rows, not pg_numrows
+    $rows = pg_numrows($result);
+    if ($debug) {
+      echo "$rows records selected.";
+      echo "<br><br>";
+    }
+
+
+    echo '<Table border="1">';
+    echo '<TR><TH>#</TH><TH>Name</TH><TH>Street </TH><TH>City, State Zip</TH>';
+    echo '<TH>Last Rec</TH><TH>Update</TH></TR>';
+    for ($i = 0 ; $i < $rows ; $i++)
+      {
+        $myarray = pg_fetch_row($result,$i);
+        echo "<TR>";
+        echo "<TD bgcolor='yellow'>";
+
+        echo ($myarray[7] . "</TD><TD> " . $myarray[1] . "<B> " . $myarray[0] . "</B></TD><TD>" . $myarray[2]);
+        echo ("</TD><TD>".$myarray[3].", ".$myarray[4]." ".$myarray[5]);
+        echo ("</TD><TD bgcolor='lightblue'>".$myarray[6]);
+        echo "</TD>";
+        echo "<TD>";
+
+        echo ('<form name="actionUpdate">');
+        echo ('<INPUT TYPE="button" VALUE="Update to ' . $setYear . '" onClick = "doUpdate1(' .  $myarray[7] . ')">');
+        echo ('</form>');
+        echo "</TD>";
+        echo "</TR>";
+
+      }
+    echo "</Table>";
+    // close database connection
+    pg_close($connection);
+  }
+
+  function output_form_1 ($index,$debug)
+  {
+    include("globals.php");
+    // open a connection to the database server
+    $connection = pg_connect("host=$host dbname=$db user=$user password=$pass");
+    if (!$connection)
+      {
+        die("Could not open connection to database server");
+      }
+    $dbname = pg_dbname($connection);
+    $dbhost = pg_host($connection);
+    if ($debug) {
+      echo('Current database: ' .  $dbname . '<br>');
+      echo('Current host: ' .  $dbhost . '<br>');
+    }
+
+    // generate and execute a query
+    $query = 'SELECT "LastName", "AddrName","Address",';
+    $query .= '"City","State","Zip", "Rec_C_Card", "Index"  FROM burgaddr."Address"';
+    $query .= ' Where "Index" = ' . "'" .  $index . "'";
+
+    if ($debug) {
+          echo ("Query = ".$query . "<br>");
+        }
+    // pg_query
+    $result = pg_exec($connection,$query) or die("Error in query: $query." . pg_last_error($connection));
+
+    // get the number of rows in the resultset
+    // pg_numrows
+    $rows = pg_numrows($result);
+    if ($debug) {
+      echo "$rows records selected.";
+      echo "<br><br>";
+    }
+    $myarray = pg_fetch_row($result,0);
+    echo '<Table border="1">';
+    echo "<TR><TD bgcolor='yellow'>Index: " . $myarray[7] . "</TD>";
+    echo '<TD rowspan="2">';
+
+    echo ('Press to delete this record:  &nbsp; &nbsp;'	);
+    echo ('<form name="actionDelete">');
+    echo ('<INPUT TYPE="button" VALUE="Delete" onClick = "smove()">');
+    echo ('</form>');
+
+    echo '</TD>';
+    echo "</TR>";
+    echo "<TR>";
+    echo "<TD>";
+    echo (  $myarray[1] . " " . $myarray[0] . "<br>" . $myarray[2]);
+    echo ("<br>".$myarray[3].", ".$myarray[4]." ".$myarray[5]);
+    echo ("</TD></TR>");
+    echo ("<TR><TD  bgcolor='lightblue'>Last received ".$myarray[6]);
+    echo "</TD><TD>";
+
+    echo ('Update to this year (' . $setYear . ') : ');
+    echo ('<form name="actionUpdate">');
+    echo ('<INPUT TYPE="button" VALUE="Update" onClick = "doUpdate()">');
+    echo ('</form>');
+    echo "</TD></TR>";
+
+    echo "</Table>";
+    // close database connection
+    pg_close($connection);
+  }
+
+  if ($labelnumber) {
+    // if a labelnumber is set, show just this one record
+    output_form_1($labelnumber,$debug);
+  }
+  else {
+    // if searchname is not set, this will display ALL records
+    // if searchname is set, only records that match the last name will be shown
+    output_form($searchname,$debug);
+  }
+
+?>
+
+
+</body>
+</html>
